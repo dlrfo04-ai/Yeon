@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>디자이너 연 — 예약</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;}
+.wrap{width:100vw;height:100vh;position:relative;overflow:hidden;font-family:'Georgia',serif;background:#08080a;}
+canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+.glitter-canvas{position:absolute;inset:0;z-index:6;pointer-events:none;}
+.frame-outer{position:absolute;inset:14px;border:0.5px solid rgba(180,150,100,0.2);z-index:3;opacity:0;animation:show 2s 0.4s forwards;}
+.frame-inner{position:absolute;inset:20px;border:0.3px solid rgba(180,150,100,0.08);z-index:3;opacity:0;animation:show 2s 0.7s forwards;}
+.content{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 48px;gap:0;}
+.top-ornament{display:flex;align-items:center;gap:10px;margin-bottom:18px;opacity:0;animation:up 1.8s 0.8s forwards;}
+.orn-line{width:28px;height:0.5px;background:rgba(180,150,100,0.45);}
+.orn-diamond{width:4px;height:4px;background:rgba(180,150,100,0.6);transform:rotate(45deg);}
+.label{font-family:'Arial',sans-serif;font-size:9px;letter-spacing:8px;color:rgba(180,150,100,0.65);font-weight:300;margin-bottom:14px;opacity:0;animation:up 1.8s 1.0s forwards;}
+.name{font-family:'Times New Roman',Georgia,serif;font-size:min(11vw,62px);color:#fff;font-weight:400;letter-spacing:14px;line-height:1;opacity:0;animation:up 2s 1.4s forwards;}
+.name-roman{font-family:'Arial',sans-serif;font-size:9px;letter-spacing:10px;color:rgba(180,150,100,0.45);font-weight:300;margin-top:10px;opacity:0;animation:up 1.6s 1.8s forwards;}
+.mid-ornament{display:flex;align-items:center;gap:0;width:100%;margin:24px 0 0;opacity:0;animation:up 1.6s 2.2s forwards;}
+.orn-left{width:16px;height:1px;background:#b49664;}
+.orn-bar{flex:1;height:0.5px;background:rgba(180,150,100,0.35);}
+.orn-center{width:5px;height:5px;border:0.5px solid rgba(180,150,100,0.5);transform:rotate(45deg);margin:0 8px;}
+.orn-right{width:16px;height:1px;background:#b49664;}
+.middle-block{padding:20px 0 0;display:flex;flex-direction:column;align-items:center;gap:7px;opacity:0;animation:up 1.8s 2.5s forwards;width:100%;}
+.salon{font-family:'Times New Roman',Georgia,serif;font-size:min(4.5vw,22px);color:#fff;font-weight:400;letter-spacing:6px;}
+.branch{font-family:'Arial',sans-serif;font-size:10px;letter-spacing:5px;color:rgba(180,150,100,0.8);font-weight:300;margin-top:2px;}
+.addr{font-family:'Arial',sans-serif;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-top:6px;}
+.bot-ornament{display:flex;align-items:center;gap:0;width:100%;margin:20px 0 0;opacity:0;animation:up 1.6s 2.8s forwards;}
+.btn-wrap{margin-top:26px;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;opacity:0;animation:up 1.8s 3.2s forwards;}
+.btn-book{
+  display:block;width:100%;max-width:240px;padding:13px 0;
+  background:transparent;border:0.5px solid rgba(180,150,100,0.55);
+  color:rgba(180,150,100,0.9);font-family:'Arial',sans-serif;
+  font-size:11px;letter-spacing:5px;text-align:center;text-decoration:none;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.btn-book:active{background:rgba(180,150,100,0.08);}
+.btn-hide{font-family:'Arial',sans-serif;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,0.15);background:transparent;border:none;cursor:pointer;padding:6px 0;-webkit-tap-highlight-color:transparent;}
+.hide-overlay{display:none;position:fixed;inset:0;background:#000;z-index:100;align-items:center;justify-content:center;}
+.hide-overlay.active{display:flex;}
+.show-btn{font-family:'Arial',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(180,150,100,0.4);background:transparent;border:none;cursor:pointer;}
+@keyframes show{to{opacity:1;}}
+@keyframes up{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <canvas id="bg"></canvas>
+  <canvas id="glitter" class="glitter-canvas"></canvas>
+  <div class="frame-outer"></div>
+  <div class="frame-inner"></div>
+  <div class="content">
+    <div class="top-ornament">
+      <div class="orn-line"></div>
+      <div class="orn-diamond"></div>
+      <div class="orn-line"></div>
+    </div>
+    <div class="label" id="el-label">D E S I G N E R</div>
+    <div class="name" id="el-name">연</div>
+    <div class="name-roman" id="el-roman">Y · E · O · N</div>
+    <div class="mid-ornament">
+      <div class="orn-left"></div>
+      <div class="orn-bar"></div>
+      <div class="orn-center"></div>
+      <div class="orn-bar"></div>
+      <div class="orn-right"></div>
+    </div>
+    <div class="middle-block">
+      <div class="salon" id="el-salon">아이드블랑</div>
+      <div class="branch" id="el-branch">계 명 대 점</div>
+      <div class="addr">대구 달서구 계대동문로 12-1</div>
+    </div>
+    <div class="bot-ornament">
+      <div class="orn-left"></div>
+      <div class="orn-bar"></div>
+      <div class="orn-center"></div>
+      <div class="orn-bar"></div>
+      <div class="orn-right"></div>
+    </div>
+    <div class="btn-wrap">
+      <a class="btn-book" href="https://m.booking.naver.com/booking/13/bizes/622103/items/7601483?area=pll&lang=ko&service-target=map-pc&startDate=2026-04-17&tab=book&theme=place" target="_blank">N A V E R &nbsp; 예 약</a>
+      <button class="btn-hide" onclick="document.getElementById('overlay').classList.add('active')">화면 숨기기</button>
+    </div>
+  </div>
+</div>
+<div class="hide-overlay" id="overlay">
+  <button class="show-btn" onclick="document.getElementById('overlay').classList.remove('active')">탭하여 다시 보기</button>
+</div>
+<script>
+const bgCanvas=document.getElementById('bg');
+const bgCtx=bgCanvas.getContext('2d');
+const glCanvas=document.getElementById('glitter');
+const glCtx=glCanvas.getContext('2d');
+const wrap=document.getElementById('wrap');
+function resize(){bgCanvas.width=glCanvas.width=wrap.offsetWidth;bgCanvas.height=glCanvas.height=wrap.offsetHeight;}
+resize();window.addEventListener('resize',resize);
+const beams=[
+  {x:0.2,angle:-11,width:2.2,speed:0.25,phase:0.0,alpha:0.32},
+  {x:0.42,angle:5, width:2.8,speed:0.20,phase:1.3,alpha:0.38},
+  {x:0.65,angle:-6,width:1.8,speed:0.28,phase:2.8,alpha:0.28},
+  {x:0.82,angle:9, width:1.2,speed:0.32,phase:4.1,alpha:0.20},
+];
+const spots=[
+  {bx:0.28,amp:0.10,sp:0.003,ph:0.0,r:0.52,a:0.10,c:'180,150,100'},
+  {bx:0.65,amp:0.08,sp:0.004,ph:2.2,r:0.44,a:0.08,c:'200,168,120'},
+  {bx:0.45,amp:0.06,sp:0.002,ph:4.0,r:0.38,a:0.06,c:'180,150,100'},
+];
+const bgParticles=Array.from({length:25},()=>({x:Math.random(),y:Math.random(),size:Math.random()*1.8+0.4,speed:Math.random()*0.0004+0.0001,opacity:Math.random()*0.5+0.15,phase:Math.random()*Math.PI*2}));
+const glitterColors=['rgba(255,245,200,','rgba(180,150,100,','rgba(255,255,255,','rgba(220,190,130,','rgba(240,215,170,'];
+const TEXT_IDS=['el-label','el-name','el-roman','el-salon','el-branch'];
+let glitters=[];
+function getElementRects(){
+  const rects=[];
+  TEXT_IDS.forEach(id=>{const el=document.getElementById(id);if(!el)return;const r=el.getBoundingClientRect(),wr=wrap.getBoundingClientRect();rects.push({x:r.left-wr.left,y:r.top-wr.top,w:r.width,h:r.height});});
+  return rects;
+}
+function spawnGlitters(){
+  const rects=getElementRects();if(!rects.length)return;
+  for(let i=0;i<2;i++){
+    const rect=rects[Math.floor(Math.random()*rects.length)];
+    glitters.push({x:rect.x+Math.random()*rect.w,y:rect.y+Math.random()*rect.h,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5-0.25,size:Math.random()*2+0.6,life:1.0,decay:Math.random()*0.015+0.007,color:glitterColors[Math.floor(Math.random()*glitterColors.length)],shape:Math.random()>0.5?'star':'circle',angle:Math.random()*Math.PI*2,spin:(Math.random()-0.5)*0.12});
+  }
+  glitters=glitters.filter(g=>g.life>0);if(glitters.length>150)glitters.splice(0,8);
+}
+setInterval(spawnGlitters,100);
+function drawStar(ctx,x,y,r,alpha,color,angle){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.beginPath();for(let i=0;i<4;i++){const a=(i/4)*Math.PI*2;ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}ctx.strokeStyle=color+alpha+')';ctx.lineWidth=0.7;ctx.stroke();ctx.beginPath();ctx.arc(0,0,r*0.28,0,Math.PI*2);ctx.fillStyle=color+alpha+')';ctx.fill();ctx.restore();}
+let t=0;
+function drawBg(){
+  const W=bgCanvas.width,H=bgCanvas.height;
+  bgCtx.clearRect(0,0,W,H);bgCtx.fillStyle='#08080a';bgCtx.fillRect(0,0,W,H);
+  spots.forEach(sp=>{
+    const cx=(sp.bx+Math.sin(t*sp.sp+sp.ph)*sp.amp)*W;
+    const pulse=sp.a*(0.65+0.35*Math.sin(t*sp.sp*2+sp.ph));
+    const grad=bgCtx.createRadialGradient(cx,-H*0.04,0,cx,-H*0.04,H*sp.r);
+    grad.addColorStop(0,`rgba(${sp.c},${pulse})`);grad.addColorStop(0.4,`rgba(${sp.c},${pulse*0.35})`);grad.addColorStop(1,'transparent');
+    bgCtx.fillStyle=grad;bgCtx.fillRect(0,0,W,H);
+    const hg=bgCtx.createRadialGradient(cx,0,0,cx,0,W*0.15);
+    hg.addColorStop(0,`rgba(255,240,200,${pulse*0.45})`);hg.addColorStop(1,'transparent');
+    bgCtx.fillStyle=hg;bgCtx.fillRect(0,0,W,H);
+  });
+  beams.forEach(b=>{
+    const pulse=b.alpha*(0.5+0.5*Math.sin(t*b.speed+b.phase));
+    bgCtx.save();bgCtx.translate(b.x*W,0);bgCtx.rotate(b.angle*Math.PI/180);
+    const g=bgCtx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'transparent');g.addColorStop(.18,`rgba(200,170,110,${pulse*0.4})`);g.addColorStop(.5,`rgba(190,160,100,${pulse})`);g.addColorStop(.8,`rgba(180,150,90,${pulse*0.4})`);g.addColorStop(1,'transparent');
+    bgCtx.fillStyle=g;bgCtx.fillRect(-b.width/2,0,b.width,H);bgCtx.restore();
+  });
+  bgParticles.forEach(p=>{
+    p.y-=p.speed;if(p.y<-0.02){p.y=1.05;p.x=Math.random();}
+    const f=p.opacity*(0.6+0.4*Math.sin(t*0.04+p.phase));
+    bgCtx.beginPath();bgCtx.arc(p.x*W,p.y*H,p.size,0,Math.PI*2);bgCtx.fillStyle=`rgba(210,180,120,${f})`;bgCtx.fill();
+  });
+}
+function drawGlitter(){
+  glCtx.clearRect(0,0,glCanvas.width,glCanvas.height);
+  glitters.forEach(g=>{g.x+=g.vx;g.y+=g.vy;g.angle+=g.spin;g.life-=g.decay;if(g.life<=0)return;if(g.shape==='star')drawStar(glCtx,g.x,g.y,g.size,g.life,g.color,g.angle);else{glCtx.beginPath();glCtx.arc(g.x,g.y,g.size*0.45,0,Math.PI*2);glCtx.fillStyle=g.color+g.life+')';glCtx.fill();}});
+}
+function loop(){drawBg();drawGlitter();t+=0.016;requestAnimationFrame(loop);}
+loop();
+</script>
+</body>
+</html>
